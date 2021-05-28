@@ -1,0 +1,38 @@
+***********Création des types de collections Enfant et Voiture******************
+create type Enfant as Object(prenom varchar2(30), age number);
+/
+
+create type Voiture as Object(marque varchar2(30), type varchar2(30), couleur varchar2(30));
+/
+
+*******Collection des Enfants et des Voitures*****************
+create type Lesenfants as Table of Enfant;
+/
+
+create type Lesvoitures as Table of Voiture;
+/
+
+
+**********Création de l'objet Personne*******************
+create type Personne as Object(nsecu varchar2(30), nom varchar2(30), adresse varchar2(30), Enfants Lesenfants, Voitures Lesvoitures);
+/
+
+************Création de la table Personne*************
+create table Lespersonnes of Personne nested table Enfants store as UnEnfant, nested table Voitures store as UneVoiture;
+/
+
+**********Insertion dans la table Lespersonnes************
+insert into Lespersonnes values(Personne('1234','Paul','Paris',Lesenfants(Enfant('Léa',7),Enfant('Max',5)),Lesvoitures(Voiture('Ferrari','F355','Rouge'),Voiture('Citroën','2CV','Blanche'))));
+/
+
+****insert dans Enfant de la personne Paul****
+insert into table(select p.Enfants from Lespersonnes p where nsecu='1234') values ('Guy',2);
+/
+
+****insert dans Voiture de la personne Paul****
+insert into table(select p.Voitures from Lespersonnes p where nsecu='1234') values ('Alpha Roméo','78QV','Bleue');
+/
+
+*****selection des marques*****
+select v.marque from table(select p.VOITURES from Lespersonnes p) v;
+/
